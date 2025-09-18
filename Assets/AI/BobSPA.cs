@@ -53,6 +53,8 @@ public class BobSPA : MonoBehaviour
         actionScores["Chase"] = (distanceCheck >= fleeDistance ? 8f : 0) + (health > (health * .5) ? 5f : 0) * (lineOfSight ? 1 : 0);
         actionScores["Patrol"] = 3f;
 
+        UpdatePrediction();
+
         //ACT
         string chosenAction = actionScores.Aggregate((l,r) => l.Value > r.Value ? l : r).Key;
         switch (chosenAction)
@@ -75,16 +77,67 @@ public class BobSPA : MonoBehaviour
     private void Flee()
     {
         Vector3 fleeDir = (transform.position - playerTrans.position).normalized * 2;
-        agent.SetDestination(fleeDir);
+        if (NavMesh.SamplePosition(fleeDir, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(fleeDir);
+        }
+        else
+        {
+            agent.SetDestination(FindFleeAlternative(fleeDir));
+        }
+            
     }
 
     private void Chase()
     {
-        agent.SetDestination(playerTrans.position);
+        agent.SetDestination(predictedPlayerPosition);
     }
 
     private void Patrol()
     {
         agent.SetDestination(patrolPoints[patrolIndex].position);
+    }
+
+    #region FleeAlternative
+    public float maxDistFromDirection = 100f;
+    public float step = 10f;
+    public float fleeLength = 3f;
+    private Vector3 FindFleeAlternative(Vector3 fleeDirection)
+    {
+        float maxDistFromPlayer = 0f;
+        Vector3 bestPosition = transform.position;
+
+        for (float angle = -maxDistFromDirection; angle <= maxDistFromDirection; angle += step)
+        {
+            Vector3 dir = Quaternion.Euler(0, angle, 0) * fleeDirection;
+            Vector3 candidate = transform.position + dir * fleeLength;
+
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 1f, NavMesh.AllAreas))
+            {
+                float distToPlayer = Vector3.Distance(transform.position, playerTrans.position);
+                if (distToPlayer > maxDistFromPlayer)
+                {
+                    maxDistFromPlayer = distToPlayer;
+                    bestPosition = hit.position;
+                }
+            }
+        }
+        return bestPosition;
+    }
+    #endregion
+
+    Vector3 lastPlayerPosition = new();
+    Vector3 predictedPlayerPosition = new();
+
+    private void UpdatePrediction()
+    {
+        Vector3 currentPlayerPosition = playerTrans.position;
+        Vector3 moveDirection = (currentPlayerPosition - lastPlayerPosition).normalized;
+
+        float predictionDistance = distanceToPlayer * 0.5f;
+
+        predictedPlayerPosition = currentPlayerPosition + moveDirection * predictionDistance;
+
+        lastPlayerPosition = currentPlayerPosition;
     }
 }
