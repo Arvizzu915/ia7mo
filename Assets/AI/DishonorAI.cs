@@ -6,14 +6,13 @@ public class DishonorAI : MonoBehaviour
 {
     public NavMeshAgent agent;
 
-    private bool lineOfSight = false;
-    private bool perifericLineOfSight = false;
+    public bool lineOfSight = false;
+    public bool perifericLineOfSight = false;
     [SerializeField] private Transform playerTrans;
-    private Vector3 lastSeen;
+    public Vector3 lastSeen;
 
-    private float searchingTime = 5f;
+    public float searchingTime = 5f;
 
-    private bool patroling = true;
     public Transform[] patrolSpots;
     private int patrolIndex = 0;
 
@@ -34,13 +33,18 @@ public class DishonorAI : MonoBehaviour
 
         if (lineOfSight)
         {
-            patroling = false;
             transform.LookAt(playerTrans);
         }
 
+        if (perifericLineOfSight)
+        {
+            lastSeen = playerTrans.position;
+            agent.SetDestination(lastSeen);
+        }
+
         Vector3 baseDirection = transform.forward;
-        Quaternion rotationOffset = Quaternion.AngleAxis(18f, transform.up);
-        Quaternion rotationOffset2 = Quaternion.AngleAxis(-18f, transform.up);
+        Quaternion rotationOffset = Quaternion.AngleAxis(35f, transform.up);
+        Quaternion rotationOffset2 = Quaternion.AngleAxis(-35f, transform.up);
 
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset * baseDirection);
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset2 * baseDirection);
@@ -51,8 +55,6 @@ public class DishonorAI : MonoBehaviour
         {
             
             perifericLineOfSight = hit2.collider.gameObject.TryGetComponent<PlayerMovement>(out PlayerMovement player);
-            lastSeen = playerTrans.position;
-            agent.SetDestination(lastSeen);
             StartCoroutine(Search());
         }
 
@@ -61,8 +63,6 @@ public class DishonorAI : MonoBehaviour
         if (Physics.Raycast(pray1, out RaycastHit hit3))
         {
             perifericLineOfSight = hit3.collider.gameObject.TryGetComponent<PlayerMovement>(out PlayerMovement player);
-            lastSeen = playerTrans.position;
-            agent.SetDestination(lastSeen);
             StartCoroutine(Search());
         }
     }
@@ -82,7 +82,6 @@ public class DishonorAI : MonoBehaviour
     private IEnumerator Search()
     {
         yield return new WaitForSeconds(searchingTime);
-        patroling = true;
         agent.SetDestination(patrolSpots[patrolIndex].position);
     }
 }
