@@ -39,8 +39,8 @@ public class DishonorAI : MonoBehaviour
         }
 
         Vector3 baseDirection = transform.forward;
-        Quaternion rotationOffset = Quaternion.AngleAxis(8f, transform.up);
-        Quaternion rotationOffset2 = Quaternion.AngleAxis(-8f, transform.up);
+        Quaternion rotationOffset = Quaternion.AngleAxis(18f, transform.up);
+        Quaternion rotationOffset2 = Quaternion.AngleAxis(-18f, transform.up);
 
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset * baseDirection);
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset2 * baseDirection);
