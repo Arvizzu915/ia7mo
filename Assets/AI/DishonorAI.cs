@@ -40,7 +40,7 @@ public class DishonorAI : MonoBehaviour
 
         Vector3 baseDirection = transform.forward;
         Quaternion rotationOffset = Quaternion.AngleAxis(8f, transform.up);
-        Quaternion rotationOffset2 = Quaternion.AngleAxis(8f, transform.up);
+        Quaternion rotationOffset2 = Quaternion.AngleAxis(-8f, transform.up);
 
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset * baseDirection);
         Debug.DrawRay(transform.position + (Vector3.up * 0.5f), rotationOffset2 * baseDirection);
@@ -69,9 +69,13 @@ public class DishonorAI : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("trigger");
+
         if (other.CompareTag("Patrol"))
         {
+            Debug.Log("change");
             patrolIndex = (patrolIndex + 1) % patrolSpots.Length;
+            agent.SetDestination(patrolSpots[patrolIndex].position);
         }
     }
 
