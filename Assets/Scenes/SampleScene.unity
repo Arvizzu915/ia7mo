@@ -2050,7 +2050,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agent: {fileID: 1931308565}
+  lineOfSight: 0
+  perifericLineOfSight: 0
   playerTrans: {fileID: 1623177535}
+  lastSeen: {x: 0, y: 0, z: 0}
+  searchingTime: 5
   patrolSpots:
   - {fileID: 1985455337}
   - {fileID: 1587841095}
@@ -2161,7 +2165,7 @@ GameObject:
   m_Layer: 0
   m_Name: patrol point
   m_TagString: Patrol
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 6519382022992737161, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
